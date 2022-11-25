@@ -1,4 +1,4 @@
-package flashbotsrpc
+package flashxroute
 
 import (
 	"math/big"

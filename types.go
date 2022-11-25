@@ -1,10 +1,9 @@
-package flashbotsrpc
+package flashxroute
 
 import (
 	"bytes"
 	"encoding/json"
 	"math/big"
-	"time"
 	"unsafe"
 
 	"github.com/pkg/errors"
@@ -331,90 +330,109 @@ type RelayErrorResponse struct {
 	Error string `json:"error"`
 }
 
-type FlashbotsUserStats struct {
-	IsHighPriority       bool   `json:"is_high_priority"`
-	AllTimeMinerPayments string `json:"all_time_miner_payments"`
-	AllTimeGasSimulated  string `json:"all_time_gas_simulated"`
-	Last7dMinerPayments  string `json:"last_7d_miner_payments"`
-	Last7dGasSimulated   string `json:"last_7d_gas_simulated"`
-	Last1dMinerPayments  string `json:"last_1d_miner_payments"`
-	Last1dGasSimulated   string `json:"last_1d_gas_simulated"`
+type BloxrouteSimulateBundleRequest struct {
+	Transaction    []string `json:"transaction"`                  // A list of raw transaction bytes without a 0x prefix.
+	BlockNumber      string `json:"block_number"`                 // Block number of a future block to include this bundle in, in hex value.
+	StateBlockNumber string `json:"state_block_number,omitempty"` /* [Optional] Block number used as the base state to run a simulation on.
+	                                                                 Valid inputs include hex value of block number, or tags like “latest” and “pending”.
+                                                                         Default value is “latest”. */
+	Timestamp        int64  `json:"timestamp,omitempty"`          // [Optional] Simulation timestamp, an integer in unix epoch format. Default value is None.
 }
 
-type FlashbotsCallBundleParam struct {
-	Txs              []string `json:"txs"`                 // Array[String], A list of signed transactions to execute in an atomic bundle
-	BlockNumber      string   `json:"blockNumber"`         // String, a hex encoded block number for which this bundle is valid on
-	StateBlockNumber string   `json:"stateBlockNumber"`    // String, either a hex encoded number or a block tag for which state to base this simulation on. Can use "latest"
-	Timestamp        int64    `json:"timestamp,omitempty"` // Number, the timestamp to use for this bundle simulation, in seconds since the unix epoch
-	Timeout          int64    `json:"timeout,omitempty"`
-	GasLimit         uint64   `json:"gasLimit,omitempty"`
-	Difficulty       uint64   `json:"difficulty,omitempty"`
-	BaseFee          uint64   `json:"baseFee,omitempty"`
+type BloxrouteBrmSimulateBundleRequest struct {
+	TransactionHash  string   `json:"transaction_hash"`             // Trigger private transaction hash.
+	Transaction      []string `json:"transaction"`                  // A list of raw transaction bytes without a 0x prefix.
+	BlockNumber      string   `json:"block_number"`                 // Block number of a future block to include this bundle in, in hex value.
+	StateBlockNumber string   `json:"state_block_number,omitempty"` /* [Optional] Block number used as the base state to run a simulation on.
+	                                                                   Valid inputs include hex value of block number, or tags like “latest” and “pending”.
+                                                                           Default value is “latest”. */
+	Timestamp        int64  `json:"timestamp,omitempty"`            // [Optional] Simulation timestamp, an integer in unix epoch format. Default value is None.
 }
 
-type FlashbotsCallBundleResult struct {
-	CoinbaseDiff      string `json:"coinbaseDiff"`      // "2717471092204423",
-	EthSentToCoinbase string `json:"ethSentToCoinbase"` // "0",
-	FromAddress       string `json:"fromAddress"`       // "0x37ff310ab11d1928BB70F37bC5E3cf62Df09a01c",
-	GasFees           string `json:"gasFees"`           // "2717471092204423",
-	GasPrice          string `json:"gasPrice"`          // "43000001459",
+type BloxrouteSimulateBundleResult struct {
 	GasUsed           int64  `json:"gasUsed"`           // 63197,
-	ToAddress         string `json:"toAddress"`         // "0xdAC17F958D2ee523a2206206994597C13D831ec7",
 	TxHash            string `json:"txHash"`            // "0xe2df005210bdc204a34ff03211606e5d8036740c686e9fe4e266ae91cf4d12df",
 	Value             string `json:"value"`             // "0x"
 	Error             string `json:"error"`
-	Revert            string `json:"revert"`
 }
 
-type FlashbotsCallBundleResponse struct {
-	BundleGasPrice    string                      `json:"bundleGasPrice"`    // "43000001459",
-	BundleHash        string                      `json:"bundleHash"`        // "0x2ca9c4d2ba00d8144d8e396a4989374443cb20fb490d800f4f883ad4e1b32158",
-	CoinbaseDiff      string                      `json:"coinbaseDiff"`      // "2717471092204423",
-	EthSentToCoinbase string                      `json:"ethSentToCoinbase"` // "0",
-	GasFees           string                      `json:"gasFees"`           // "2717471092204423",
-	Results           []FlashbotsCallBundleResult `json:"results"`           // [],
-	StateBlockNumber  int64                       `json:"stateBlockNumber"`  // 12960319,
-	TotalGasUsed      int64                       `json:"totalGasUsed"`      // 63197
+type BloxrouteSimulateBundleResponse struct {
+	BundleGasPrice    string                          `json:"bundleGasPrice"`    // "43000001459",
+	BundleHash        string                          `json:"bundleHash"`        // "0x2ca9c4d2ba00d8144d8e396a4989374443cb20fb490d800f4f883ad4e1b32158",
+	CoinbaseDiff      string                          `json:"coinbaseDiff"`      // "2717471092204423",
+	EthSentToCoinbase string                          `json:"ethSentToCoinbase"` // "0",
+	GasFees           string                          `json:"gasFees"`           // "2717471092204423",
+	Results           []BloxrouteSimulateBundleResult `json:"results"`           // [],
+	StateBlockNumber  int64                           `json:"stateBlockNumber"`  // 12960319,
+	TotalGasUsed      int64                           `json:"totalGasUsed"`      // 63197
 }
 
-// sendBundle
-type FlashbotsSendBundleRequest struct {
-	Txs          []string  `json:"txs"`                         // Array[String], A list of signed transactions to execute in an atomic bundle
-	BlockNumber  string    `json:"blockNumber"`                 // String, a hex encoded block number for which this bundle is valid on
-	MinTimestamp *uint64   `json:"minTimestamp,omitempty"`      // (Optional) Number, the minimum timestamp for which this bundle is valid, in seconds since the unix epoch
-	MaxTimestamp *uint64   `json:"maxTimestamp,omitempty"`      // (Optional) Number, the maximum timestamp for which this bundle is valid, in seconds since the unix epoch
-	RevertingTxs *[]string `json:"revertingTxHashes,omitempty"` // (Optional) Array[String], A list of tx hashes that are allowed to revert
+type BloxrouteBrmSimulateBundleResponse struct {
+	BloxrouteDiff     string                          `json:"bloxrouteDiff"`     // "10000"
+	BundleGasPrice    string                          `json:"bundleGasPrice"`    // "43000001459",
+	BundleHash        string                          `json:"bundleHash"`        // "0x2ca9c4d2ba00d8144d8e396a4989374443cb20fb490d800f4f883ad4e1b32158",
+	CoinbaseDiff      string                          `json:"coinbaseDiff"`      // "2717471092204423",
+	EthSentToCoinbase string                          `json:"ethSentToCoinbase"` // "0",
+	GasFees           string                          `json:"gasFees"`           // "2717471092204423",
+	MinerDiff         string                          `json:"minerDiff"`         // "100000"
+	Results           []BloxrouteSimulateBundleResult `json:"results"`           // [],
+	SenderDiff        string                          `json:"senderDiff"`        // "50000"
+	StateBlockNumber  int64                           `json:"stateBlockNumber"`  // 12960319,
+	TotalGasUsed      int64                           `json:"totalGasUsed"`      // 63197
+	Status            string                          `json:"status"`            // "good"
 }
 
-type FlashbotsGetBundleStatsParam struct {
-	BlockNumber string `json:"blockNumber"` // String, a hex encoded block number for which this bundle is valid on
-	BundleHash  string `json:"bundleHash"`  // String, returned by the flashbots api when calling eth_sendBundle
+// SubmitBundle
+type BloxrouteSubmitBundleRequest struct {
+	Transaction  []string     `json:"transaction"`                   // A list of raw transaction bytes without a 0x prefix.
+	BlockNumber  string       `json:"block_number"`                  /* Block number of a future block to include this bundle in, in hex value.
+                                                                            For traders who would like more than one block to be targeted, please send multiple requests targeting each specific block. */
+	MinTimestamp *uint64      `json:"min_timestamp,omitempty"`       // [Optional] The minimum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
+	MaxTimestamp *uint64      `json:"max_timestamp,omitempty"`       // [Optional] The maximum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
+	RevertingHashes *[]string `json:"reverting_hashes,omitempty"` /* [Optional] A list of transaction hashes within the bundle that are allowed to revert.
+                                                                           Default is empty list: the whole bundle would be excluded if any transaction reverts. */
+	Uuid         string       `json:"uuid,omitempty"`                /* [Optional] A unique identifier of the bundle. This field can be used for bundle replacement and bundle cancellation.
+                                                                            Some builders like bloxroute and builder0x69 support this field. After receiving a new UUID bundle,
+                                                                            the builder would replace the previous bundle that has the same UUID. When the list of transactions is empty in new UUID bundle,
+                                                                            the previous bundle associated with the same UUID would be effectively canceled.
+                                                                            The response is empty/null instead of bundle hash when UUID is provided in the request. */
+	Frontrunning bool         `json:"frontrunning,omitempty"`        /* [Optional, default: True] A boolean flag indicating if the MEV bundle executes frontrunning strategy (e.g. generalized frontrunning,
+                                                                            sandwiching). Some block builders and validators may not want to accept frontrunning bundles, which may experience a lower hash power. */
+	EffectiveGasPrice string  `json:"effective_gas_price,omitempty"` // [Optional, default: 0] An integer representing current bundle's effective gas price in wei.
+	CoinbaseProfit    string  `json:"coinbase_profit"`               // [Optional, default: 0] An integer representing current bundle's coinbase profit in wei.
+	MevBuilders  []string                                            /* [Optional, default: bloxroute builder and flashbots builder] A dictionary of MEV builders that should receive the bundle.
+                                                                            For each MEV builder, a signature is required. For flashbots builder, please provide the signature used in X-Flashbots-Signature header.
+                                                                            For other builders, please provide empty string as signature. 
+                                                                            Possible MEV builders are:
+                                                                                bloxroute: bloXroute internal builder
+                                                                                flashbots: flashbots builder
+                                                                                builder0x69: builder0x69​
+                                                                                beaverbuild:  beaverbuild.org​
+                                                                                all: all builders
+                                                                            Traders can refer to List of External Builders page for a full list. */
 }
 
-type FlashbotsGetBundleStatsResponse struct {
-	IsSimulated    bool      `json:"isSimulated"`
-	IsSentToMiners bool      `json:"isSentToMiners"`
-	IsHighPriority bool      `json:"isHighPriority"`
-	SimulatedAt    time.Time `json:"simulatedAt"`
-	SubmittedAt    time.Time `json:"submittedAt"`
-	SentToMinersAt time.Time `json:"sentToMinersAt"`
+// BackRunMeSubmitBundle
+type BloxrouteBrmSubmitBundleRequest struct {
+	TransactionHash string   `json:"transaction_hash"`        // Trigger transaction hash  
+	Transaction     []string `json:"transaction"`             // A list of raw transaction bytes without a 0x prefix.
+	BlockNumber     string   `json:"block_number"`            /* Block number of a future block to include this bundle in, in hex value.
+                                                                     For traders who would like more than one block to be targeted, please send multiple requests targeting each specific block. */
+	MinTimestamp    *uint64  `json:"min_timestamp,omitempty"` // [Optional] The minimum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
+	MaxTimestamp    *uint64  `json:"max_timestamp,omitempty"` // [Optional] The maximum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
 }
 
-type FlashbotsSendBundleResponse struct {
+type BloxrouteSubmitBundleResponse struct {
 	BundleHash string `json:"bundleHash"`
 }
 
-// sendPrivateTransaction
-type FlashbotsSendPrivateTransactionRequest struct {
-	Tx          string                         `json:"tx"`
-	Preferences *FlashbotsPrivateTxPreferences `json:"preferences,omitempty"`
-}
-
-type FlashbotsPrivateTxPreferences struct {
-	Fast bool `json:"fast"`
-}
-
-// cancelPrivateTransaction
-type FlashbotsCancelPrivateTransactionRequest struct {
-	TxHash string `json:"txHash"`
+// SendTransaction
+type BloxrouteSendTransactionRequest struct {
+	Transaction          string     `json:"transaction"`                  // [Mandatory] Raw transactions bytes without 0x prefix.
+	NonceMonitoring      bool       `json:"nonce_monitoring,omitempty"`   /* [Optional, default: False] A boolean flag indicating if Tx Nonce Monitoring should be enabled for the transaction.
+                                                                                 This parameter only effects Cloud-API requests.
+	                                                                         *Currently only available for users testing the Beta version, but will soon be available to all. */
+	BlockchainNetwork    string     `json:""blockchain_network,omitempty` /* [Optional, default: Mainnet] Blockchain network name. Use with Cloud-API when working with BSC.
+                                                                                 Available options are: Mainnet for ETH Mainnet, BSC-Mainnet for BSC Mainnet, and Polygon-Mainnet for Polygon Mainnet. */
+	ValidatorsOnly       bool       `json:"validators_only,omitempty"`    // [Optional, default: False] Support for semi private transactions in all networks. See section Semi-Private Transaction for more info.
 }

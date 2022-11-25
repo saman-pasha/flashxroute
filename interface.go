@@ -1,4 +1,4 @@
-package flashbotsrpc
+package flashxroute
 
 import (
 	"math/big"
@@ -47,4 +47,4 @@ type EthereumAPI interface {
 	EthGetLogs(params FilterParams) ([]Log, error)
 }
 
-var _ EthereumAPI = (*FlashbotsRPC)(nil)
+var _ EthereumAPI = (*FlashXRoute)(nil)

@@ -1,12 +1,13 @@
-package flashbotsrpc
+package flashxroute
 
 import (
 	"bytes"
 	"fmt"
-	"math/big"
 	"strconv"
 	"strings"
-
+	"math/big"
+	"encoding/base64"
+	
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -46,4 +47,8 @@ func TxToRlp(tx *types.Transaction) string {
 	var buff bytes.Buffer
 	tx.EncodeRLP(&buff)
 	return fmt.Sprintf("%x", buff.Bytes())
+}
+
+func AuthorizationHeader(accountId string, secretHash string) string {
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", accountId, secretHash)))
 }

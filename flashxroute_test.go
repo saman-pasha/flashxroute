@@ -1,4 +1,4 @@
-package flashbotsrpc
+package flashxroute
 
 //lint:file-ignore SA4006 ignore for now
 
@@ -20,13 +20,13 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type FlashbotsRPCTestSuite struct {
+type FlashXRouteTestSuite struct {
 	suite.Suite
-	rpc     *FlashbotsRPC
+	rpc     *FlashXRoute
 	privKey *ecdsa.PrivateKey
 }
 
-func (s *FlashbotsRPCTestSuite) registerResponse(result string, callback func([]byte)) {
+func (s *FlashXRouteTestSuite) registerResponse(result string, callback func([]byte)) {
 	httpmock.Reset()
 	response := fmt.Sprintf(`{"jsonrpc":"2.0", "id":1, "result": %s}`, result)
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
@@ -35,14 +35,14 @@ func (s *FlashbotsRPCTestSuite) registerResponse(result string, callback func([]
 	})
 }
 
-func (s *FlashbotsRPCTestSuite) registerResponseError(err error) {
+func (s *FlashXRouteTestSuite) registerResponseError(err error) {
 	httpmock.Reset()
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
 		return nil, err
 	})
 }
 
-func (s *FlashbotsRPCTestSuite) getBody(request *http.Request) []byte {
+func (s *FlashXRouteTestSuite) getBody(request *http.Request) []byte {
 	defer request.Body.Close()
 	body, err := ioutil.ReadAll(request.Body)
 	s.Require().Nil(err)
@@ -50,13 +50,13 @@ func (s *FlashbotsRPCTestSuite) getBody(request *http.Request) []byte {
 	return body
 }
 
-func (s *FlashbotsRPCTestSuite) methodEqual(body []byte, expected string) {
+func (s *FlashXRouteTestSuite) methodEqual(body []byte, expected string) {
 	value := gjson.GetBytes(body, "method").String()
 
 	s.Require().Equal(expected, value)
 }
 
-func (s *FlashbotsRPCTestSuite) paramsEqual(body []byte, expected string) {
+func (s *FlashXRouteTestSuite) paramsEqual(body []byte, expected string) {
 	value := gjson.GetBytes(body, "params").Raw
 	if expected == "null" {
 		s.Require().Equal(expected, value)
@@ -65,8 +65,8 @@ func (s *FlashbotsRPCTestSuite) paramsEqual(body []byte, expected string) {
 	}
 }
 
-func (s *FlashbotsRPCTestSuite) SetupSuite() {
-	s.rpc = NewFlashbotsRPC("http://127.0.0.1:8545", WithHttpClient(http.DefaultClient), WithLogger(nil), WithDebug(false))
+func (s *FlashXRouteTestSuite) SetupSuite() {
+	s.rpc = NewFlashXRoute("http://127.0.0.1:8545", WithHttpClient(http.DefaultClient), WithLogger(nil), WithDebug(false))
 
 	privateKey, _ := crypto.GenerateKey()
 	s.privKey = privateKey
@@ -74,19 +74,19 @@ func (s *FlashbotsRPCTestSuite) SetupSuite() {
 	httpmock.Activate()
 }
 
-func (s *FlashbotsRPCTestSuite) TearDownSuite() {
+func (s *FlashXRouteTestSuite) TearDownSuite() {
 	httpmock.Deactivate()
 }
 
-func (s *FlashbotsRPCTestSuite) TearDownTest() {
+func (s *FlashXRouteTestSuite) TearDownTest() {
 	httpmock.Reset()
 }
 
-func (s *FlashbotsRPCTestSuite) TestURL() {
+func (s *FlashXRouteTestSuite) TestURL() {
 	s.Require().Equal(s.rpc.url, s.rpc.URL())
 }
 
-func (s *FlashbotsRPCTestSuite) TestWeb3ClientVersion() {
+func (s *FlashXRouteTestSuite) TestWeb3ClientVersion() {
 	response := `{"jsonrpc":"2.0", "id":1, "result": "test client"}`
 
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
@@ -102,7 +102,7 @@ func (s *FlashbotsRPCTestSuite) TestWeb3ClientVersion() {
 	s.Require().Equal("test client", v)
 }
 
-func (s *FlashbotsRPCTestSuite) TestCall() {
+func (s *FlashXRouteTestSuite) TestCall() {
 	// Test http error
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
 		return nil, errors.New("Error")
@@ -132,7 +132,7 @@ func (s *FlashbotsRPCTestSuite) TestCall() {
 	s.Require().Equal("eee", ethError.Message)
 }
 
-func (s *FlashbotsRPCTestSuite) Test_call() {
+func (s *FlashXRouteTestSuite) Test_call() {
 	// Test http error
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
 		return nil, fmt.Errorf("Error")
@@ -151,7 +151,7 @@ func (s *FlashbotsRPCTestSuite) Test_call() {
 	s.Require().NotNil(err)
 }
 
-func (s *FlashbotsRPCTestSuite) TestWeb3Sha3() {
+func (s *FlashXRouteTestSuite) TestWeb3Sha3() {
 	response := `{"jsonrpc":"2.0", "id":1, "result": "sha3result"}`
 
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
@@ -167,7 +167,7 @@ func (s *FlashbotsRPCTestSuite) TestWeb3Sha3() {
 	s.Require().Equal("sha3result", result)
 }
 
-func (s *FlashbotsRPCTestSuite) TestNetVersion() {
+func (s *FlashXRouteTestSuite) TestNetVersion() {
 	response := `{"jsonrpc":"2.0", "id":1, "result": "v2b3"}`
 
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
@@ -183,7 +183,7 @@ func (s *FlashbotsRPCTestSuite) TestNetVersion() {
 	s.Require().Equal("v2b3", v)
 }
 
-func (s *FlashbotsRPCTestSuite) TestNetListening() {
+func (s *FlashXRouteTestSuite) TestNetListening() {
 	response := `{"jsonrpc":"2.0", "id":1, "result": true}`
 	httpmock.RegisterResponder("POST", s.rpc.url, func(request *http.Request) (*http.Response, error) {
 		body := s.getBody(request)
@@ -212,7 +212,7 @@ func (s *FlashbotsRPCTestSuite) TestNetListening() {
 	s.Require().False(listening)
 }
 
-func (s *FlashbotsRPCTestSuite) TestNetPeerCount() {
+func (s *FlashXRouteTestSuite) TestNetPeerCount() {
 	// Test error
 	s.registerResponseError(errors.New("Error"))
 	peerCount, err := s.rpc.NetPeerCount()
@@ -230,7 +230,7 @@ func (s *FlashbotsRPCTestSuite) TestNetPeerCount() {
 	s.Require().Equal(34, peerCount)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthProtocolVersion() {
+func (s *FlashXRouteTestSuite) TestEthProtocolVersion() {
 	s.registerResponse(`"54"`, func(body []byte) {
 		s.methodEqual(body, "eth_protocolVersion")
 		s.paramsEqual(body, "null")
@@ -241,7 +241,7 @@ func (s *FlashbotsRPCTestSuite) TestEthProtocolVersion() {
 	s.Require().Equal("54", protocolVersion)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthSyncing() {
+func (s *FlashXRouteTestSuite) TestEthSyncing() {
 	s.registerResponseError(errors.New("Error"))
 	syncing, err := s.rpc.EthSyncing()
 	s.Require().NotNil(err)
@@ -278,7 +278,7 @@ func (s *FlashbotsRPCTestSuite) TestEthSyncing() {
 	s.Require().Equal(expected, syncing)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthCoinbase() {
+func (s *FlashXRouteTestSuite) TestEthCoinbase() {
 	s.registerResponse(`"0x407d73d8a49eeb85d32cf465507dd71d507100c1"`, func(body []byte) {
 		s.methodEqual(body, "eth_coinbase")
 		s.paramsEqual(body, "null")
@@ -288,7 +288,7 @@ func (s *FlashbotsRPCTestSuite) TestEthCoinbase() {
 	s.Require().Nil(err)
 	s.Require().Equal("0x407d73d8a49eeb85d32cf465507dd71d507100c1", address)
 }
-func (s *FlashbotsRPCTestSuite) TestEthMining() {
+func (s *FlashXRouteTestSuite) TestEthMining() {
 	s.registerResponse(`true`, func(body []byte) {
 		s.methodEqual(body, "eth_mining")
 		s.paramsEqual(body, "null")
@@ -306,7 +306,7 @@ func (s *FlashbotsRPCTestSuite) TestEthMining() {
 	s.Require().False(mining)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthHashrate() {
+func (s *FlashXRouteTestSuite) TestEthHashrate() {
 	s.registerResponseError(errors.New("Error"))
 	hashrate, err := s.rpc.EthHashrate()
 	s.Require().NotNil(err)
@@ -321,7 +321,7 @@ func (s *FlashbotsRPCTestSuite) TestEthHashrate() {
 	s.Require().Equal(906, hashrate)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGasPrice() {
+func (s *FlashXRouteTestSuite) TestEthGasPrice() {
 	s.registerResponseError(errors.New("Error"))
 	gasPrice, err := s.rpc.EthGasPrice()
 	s.Require().NotNil(err)
@@ -337,7 +337,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGasPrice() {
 	s.Require().Equal(*expected, gasPrice)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthAccounts() {
+func (s *FlashXRouteTestSuite) TestEthAccounts() {
 	s.registerResponse(`["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]`, func(body []byte) {
 		s.methodEqual(body, "eth_accounts")
 		s.paramsEqual(body, "null")
@@ -348,7 +348,7 @@ func (s *FlashbotsRPCTestSuite) TestEthAccounts() {
 	s.Require().Equal([]string{"0x407d73d8a49eeb85d32cf465507dd71d507100c1"}, accounts)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthBlockNumber() {
+func (s *FlashXRouteTestSuite) TestEthBlockNumber() {
 	s.registerResponseError(errors.New("Error"))
 	blockBumber, err := s.rpc.EthBlockNumber()
 	s.Require().NotNil(err)
@@ -363,7 +363,7 @@ func (s *FlashbotsRPCTestSuite) TestEthBlockNumber() {
 	s.Require().Equal(3664696, blockBumber)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetBalance() {
+func (s *FlashXRouteTestSuite) TestEthGetBalance() {
 	address := "0x407d73d8a49eeb85d32cf465507dd71d507100c1"
 	s.registerResponseError(errors.New("Error"))
 	balance, err := s.rpc.EthGetBalance(address, "latest")
@@ -380,7 +380,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetBalance() {
 	s.Require().Equal(*expected, balance)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetStorageAt() {
+func (s *FlashXRouteTestSuite) TestEthGetStorageAt() {
 	data := "0x295a70b2de5e3953354a6a8344e616ed314d7251"
 	position := 33
 	tag := "pending"
@@ -395,7 +395,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetStorageAt() {
 	s.Require().Equal("0x00000000000000000000000000000000000000000000000000000000000004d2", result)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetTransactionCount() {
+func (s *FlashXRouteTestSuite) TestEthGetTransactionCount() {
 	address := "0x407d73d8a49eeb85d32cf465507dd71d507100c1"
 	s.registerResponseError(errors.New("Error"))
 	count, err := s.rpc.EthGetTransactionCount(address, "latest")
@@ -411,7 +411,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetTransactionCount() {
 	s.Require().Equal(16, count)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetBlockTransactionCountByHash() {
+func (s *FlashXRouteTestSuite) TestEthGetBlockTransactionCountByHash() {
 	hash := "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"
 	s.registerResponseError(errors.New("Error"))
 	count, err := s.rpc.EthGetBlockTransactionCountByHash(hash)
@@ -427,7 +427,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetBlockTransactionCountByHash() {
 	s.Require().Equal(11, count)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetBlockTransactionCountByNumber() {
+func (s *FlashXRouteTestSuite) TestEthGetBlockTransactionCountByNumber() {
 	number := 2384732
 	s.registerResponseError(errors.New("Error"))
 	count, err := s.rpc.EthGetBlockTransactionCountByNumber(number)
@@ -443,7 +443,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetBlockTransactionCountByNumber() {
 	s.Require().Equal(232, count)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetUncleCountByBlockHash() {
+func (s *FlashXRouteTestSuite) TestEthGetUncleCountByBlockHash() {
 	hash := "0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"
 	s.registerResponseError(errors.New("Error"))
 	count, err := s.rpc.EthGetUncleCountByBlockHash(hash)
@@ -459,7 +459,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetUncleCountByBlockHash() {
 	s.Require().Equal(10, count)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetUncleCountByBlockNumber() {
+func (s *FlashXRouteTestSuite) TestEthGetUncleCountByBlockNumber() {
 	number := 3987434
 	s.registerResponseError(errors.New("Error"))
 	count, err := s.rpc.EthGetUncleCountByBlockNumber(number)
@@ -475,7 +475,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetUncleCountByBlockNumber() {
 	s.Require().Equal(902, count)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetCode() {
+func (s *FlashXRouteTestSuite) TestEthGetCode() {
 	address := "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
 	result := "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
 	s.registerResponse(fmt.Sprintf(`"%s"`, result), func(body []byte) {
@@ -488,7 +488,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetCode() {
 	s.Require().Equal(result, code)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthSign() {
+func (s *FlashXRouteTestSuite) TestEthSign() {
 	address := "0x9b2055d370f73ec7d8a03e965129118dc8f5bf83"
 	data := "0xdeadbeaf"
 	result := "0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b"
@@ -502,7 +502,7 @@ func (s *FlashbotsRPCTestSuite) TestEthSign() {
 	s.Require().Equal(result, signed)
 }
 
-func (s *FlashbotsRPCTestSuite) TestSendTransaction() {
+func (s *FlashXRouteTestSuite) TestSendTransaction() {
 	t := T{
 		From:     "0x3cc1a3c082944b9dba70e490e481dd56",
 		To:       "0x1bf21cb1dc384d019a885a06973f7308",
@@ -546,7 +546,7 @@ func (s *FlashbotsRPCTestSuite) TestSendTransaction() {
 	s.Require().Equal(result, txid)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthSendRawTransaction() {
+func (s *FlashXRouteTestSuite) TestEthSendRawTransaction() {
 	data := "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"
 	result := "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
 	s.registerResponse(fmt.Sprintf(`"%s"`, result), func(body []byte) {
@@ -559,7 +559,7 @@ func (s *FlashbotsRPCTestSuite) TestEthSendRawTransaction() {
 	s.Require().Equal(result, txid)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetCompilers() {
+func (s *FlashXRouteTestSuite) TestEthGetCompilers() {
 	s.registerResponse(`["solidity", "some comp"]`, func(body []byte) {
 		s.methodEqual(body, "eth_getCompilers")
 		s.paramsEqual(body, "null")
@@ -571,7 +571,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetCompilers() {
 
 }
 
-func (s *FlashbotsRPCTestSuite) TestGetBlock() {
+func (s *FlashXRouteTestSuite) TestGetBlock() {
 	s.registerResponseError(errors.New("Error"))
 	block, err := s.rpc.getBlock("eth_getBlockByHash", true)
 	s.Require().NotNil(err)
@@ -754,7 +754,7 @@ func (s *FlashbotsRPCTestSuite) TestGetBlock() {
 	s.Require().Nil(err)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetBlockByHash() {
+func (s *FlashXRouteTestSuite) TestEthGetBlockByHash() {
 	// Test with transactions
 	hash := "0x111"
 	s.registerResponse(`{}`, func(body []byte) {
@@ -778,7 +778,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetBlockByHash() {
 	s.Require().Nil(err)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetBlockByNumber() {
+func (s *FlashXRouteTestSuite) TestEthGetBlockByNumber() {
 	// Test with transactions
 	number := 3274863
 	s.registerResponse(`{}`, func(body []byte) {
@@ -802,7 +802,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetBlockByNumber() {
 	s.Require().Nil(err)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthCall() {
+func (s *FlashXRouteTestSuite) TestEthCall() {
 	s.registerResponse(`"0x11"`, func(body []byte) {
 		s.methodEqual(body, "eth_call")
 		s.paramsEqual(body, `[{"from":"0x111","to":"0x222"}, "ttt"]`)
@@ -816,7 +816,7 @@ func (s *FlashbotsRPCTestSuite) TestEthCall() {
 	s.Require().Equal("0x11", result)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthEstimateGas() {
+func (s *FlashXRouteTestSuite) TestEthEstimateGas() {
 	s.registerResponseError(errors.New("error"))
 	result, err := s.rpc.EthEstimateGas(T{
 		From: "0x111",
@@ -836,7 +836,7 @@ func (s *FlashbotsRPCTestSuite) TestEthEstimateGas() {
 	s.Require().Equal(20514, result)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetTransactionReceipt() {
+func (s *FlashXRouteTestSuite) TestEthGetTransactionReceipt() {
 	hash := "0x9c17afa5336d3cfd47e2e795520959b92e627e123e538fd4d5d7ece9025a8dce"
 	s.registerResponseError(errors.New("error"))
 	receipt, err := s.rpc.EthGetTransactionReceipt(hash)
@@ -897,7 +897,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetTransactionReceipt() {
 	}, receipt.Logs[0])
 }
 
-func (s *FlashbotsRPCTestSuite) TestGetTransaction() {
+func (s *FlashXRouteTestSuite) TestGetTransaction() {
 	result := `{
         "blockHash": "0x8b0404b2e5173e7abdbfc98f521d50808486ccaff3cd0a6344e0bb6c7aa8cef0",
         "blockNumber": "0x4109ed",
@@ -931,7 +931,7 @@ func (s *FlashbotsRPCTestSuite) TestGetTransaction() {
 	s.Require().Equal("0x522", transaction.Input)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByHash() {
+func (s *FlashXRouteTestSuite) TestEthGetTransactionByHash() {
 	s.registerResponse(`{}`, func(body []byte) {
 		s.methodEqual(body, "eth_getTransactionByHash")
 		s.paramsEqual(body, `["0x123"]`)
@@ -942,7 +942,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByHash() {
 	s.Require().NotNil(t)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByBlockHashAndIndex() {
+func (s *FlashXRouteTestSuite) TestEthGetTransactionByBlockHashAndIndex() {
 	s.registerResponse(`{}`, func(body []byte) {
 		s.methodEqual(body, "eth_getTransactionByBlockHashAndIndex")
 		s.paramsEqual(body, `["0x623", "0x12"]`)
@@ -953,7 +953,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByBlockHashAndIndex() {
 	s.Require().NotNil(t)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByBlockNumberAndIndex() {
+func (s *FlashXRouteTestSuite) TestEthGetTransactionByBlockNumberAndIndex() {
 	s.registerResponse(`{}`, func(body []byte) {
 		s.methodEqual(body, "eth_getTransactionByBlockNumberAndIndex")
 		s.paramsEqual(body, `["0x1f537da", "0xa"]`)
@@ -964,7 +964,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetTransactionByBlockNumberAndIndex() {
 	s.Require().NotNil(t)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithAddress() {
+func (s *FlashXRouteTestSuite) TestEthNewFilterWithAddress() {
 	address := []string{"0xb2b2eeeee341e560da3d439ef5e5309d78a22a66"}
 	filterData := FilterParams{Address: address}
 	result := "0x6996a3a4788d4f2067108d1f536d4330"
@@ -978,7 +978,7 @@ func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithAddress() {
 	s.Require().Equal(result, filterID)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithTopics() {
+func (s *FlashXRouteTestSuite) TestEthNewFilterWithTopics() {
 	topics := [][]string{
 		{
 			"0xb2b2eeeee341e560da3d439ef5e5309d78a22a66",
@@ -997,7 +997,7 @@ func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithTopics() {
 	s.Require().Equal(result, filterID)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithAddressAndTopics() {
+func (s *FlashXRouteTestSuite) TestEthNewFilterWithAddressAndTopics() {
 	topics := [][]string{
 		{"0xb2b2eeeee341e560da3d439ef5e5309d78a22a66"},
 		{"0xb2b2fffff341e560da3d439ef5e5309d78a22a66"},
@@ -1015,7 +1015,7 @@ func (s *FlashbotsRPCTestSuite) TestEthNewFilterWithAddressAndTopics() {
 	s.Require().Equal(result, filterID)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthNewBlockFilter() {
+func (s *FlashXRouteTestSuite) TestEthNewBlockFilter() {
 	result := "0x6996a3a4788d4f2067108d1f536d4330"
 	s.registerResponse(fmt.Sprintf(`"%s"`, result), func(body []byte) {
 		s.methodEqual(body, "eth_newBlockFilter")
@@ -1026,7 +1026,7 @@ func (s *FlashbotsRPCTestSuite) TestEthNewBlockFilter() {
 	s.Require().Equal(result, filterID)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthNewPendingTransactionFilter() {
+func (s *FlashXRouteTestSuite) TestEthNewPendingTransactionFilter() {
 	result := "0x153"
 	s.registerResponse(fmt.Sprintf(`"%s"`, result), func(body []byte) {
 		s.methodEqual(body, "eth_newPendingTransactionFilter")
@@ -1037,7 +1037,7 @@ func (s *FlashbotsRPCTestSuite) TestEthNewPendingTransactionFilter() {
 	s.Require().Equal(result, filterID)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetFilterChanges() {
+func (s *FlashXRouteTestSuite) TestEthGetFilterChanges() {
 	filterID := "0x6996a3a4788d4f2067108d1f536d4330"
 	result := `[{
 		"address":"0xaca0cc3a6bf9552f2866ccc67801d4e6aa6a70f2",
@@ -1068,7 +1068,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetFilterChanges() {
 	}, logs)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetFilterLogs() {
+func (s *FlashXRouteTestSuite) TestEthGetFilterLogs() {
 	filterID := "0x6996a3a4788d4f2067108d1f536d4330"
 	result := `[{
 		"address": "0xaca0cc3a6bf9552f2866ccc67801d4e6aa6a70f2",
@@ -1099,7 +1099,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetFilterLogs() {
 	}, logs)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthGetLogs() {
+func (s *FlashXRouteTestSuite) TestEthGetLogs() {
 	params := FilterParams{
 		FromBlock: "0x1",
 		ToBlock:   "0x10",
@@ -1143,7 +1143,7 @@ func (s *FlashbotsRPCTestSuite) TestEthGetLogs() {
 	}, logs)
 }
 
-func (s *FlashbotsRPCTestSuite) TestEthUninstallFilter() {
+func (s *FlashXRouteTestSuite) TestEthUninstallFilter() {
 	filterID := "0x6996a3a4788d4f2067108d1f536d4330"
 	result := "true"
 	s.registerResponse(result, func(body []byte) {
@@ -1157,7 +1157,7 @@ func (s *FlashbotsRPCTestSuite) TestEthUninstallFilter() {
 	s.Require().Equal(boolRes, uninstall)
 }
 
-func (s *FlashbotsRPCTestSuite) TestFlashbotsGetBundleStats() {
+func (s *FlashXRouteTestSuite) TestFlashbotsGetBundleStats() {
 	params := FlashbotsGetBundleStatsParam{
 		BlockNumber: "0x7a69",
 		BundleHash:  "0xdeadc0de",
@@ -1195,8 +1195,8 @@ func (s *FlashbotsRPCTestSuite) TestFlashbotsGetBundleStats() {
 	s.Require().Equal(expected, bundleStats)
 }
 
-func TestFlashbotsRPCTestSuite(t *testing.T) {
-	suite.Run(t, new(FlashbotsRPCTestSuite))
+func TestFlashXRouteTestSuite(t *testing.T) {
+	suite.Run(t, new(FlashXRouteTestSuite))
 }
 
 func TestEthError(t *testing.T) {
@@ -1209,7 +1209,7 @@ func TestEthError(t *testing.T) {
 }
 
 func TestEth1(t *testing.T) {
-	client := NewFlashbotsRPC("")
+	client := NewFlashXRoute("")
 	require.Equal(t, int64(1000000000000000000), Eth1().Int64())
 	require.Equal(t, int64(1000000000000000000), client.Eth1().Int64())
 }

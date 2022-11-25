@@ -1,21 +1,21 @@
-# Flashbots RPC client
+# Flashbots bloXroute MEV-Services RPC client
 
 [![Test status](https://github.com/metachris/flashbotsrpc/workflows/Test/badge.svg)](https://github.com/metachris/flashbotsrpc/actions?query=workflow%3A%22Test%22)
 
-Fork of [ethrpc](https://github.com/onrik/ethrpc) with additional [Flashbots RPC methods](https://docs.flashbots.net/flashbots-auction/searchers/advanced/rpc-endpoint):
+Fork of [ethrpc](https://github.com/metachris/flashbotsrpc) which is forked of [ethrpc](https://github.com/onrik/ethrpc) with additional [bloXroute methods](https://docs.bloxroute.com/apis/mev-solution):
 
-* `FlashbotsCallBundle` ([`eth_callBundle`](https://docs.flashbots.net/flashbots-auction/searchers/advanced/rpc-endpoint/#eth_callbundle))
-* `FlashbotsSendBundle` ([`eth_sendBundle`](https://docs.flashbots.net/flashbots-auction/searchers/advanced/rpc-endpoint/#eth_sendbundle))
-* `FlashbotsGetUserStats` ([`flashbots_getUserStats`](https://docs.flashbots.net/flashbots-auction/searchers/advanced/rpc-endpoint/#flashbots_getuserstats))
-* `FlashbotsSendPrivateTransaction` (`eth_sendPrivateTransaction`)
-* `FlashbotsCancelPrivateTransaction` (`eth_cancelPrivateTransaction`)
-* `FlashbotsSimulateBlock`: simulate a full block
+* `BloxrouteSimulateBundle`
+* `BloxrouteSubmitBundle`
+* `BloxrouteBrmSimulateBundle` (BackRunMe)
+* `BloxrouteBrmSubmitBundle` (BackRunMe)
+* `BloxrouteSendTransaction`
+* `BloxrouteSimulateBlock`: (simulate a full block)
 
 ## Usage
 
 Add library to your project:
 
-`go get github.com/metachris/flashbotsrpc`
+`go get github.com/saman-pasha/flashxroute`
 
 Create a new private key here for testing (you probably want to use an existing one):
 

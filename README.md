@@ -1,8 +1,8 @@
 # Flashbots bloXroute MEV-Services RPC client
 
-[![Test status](https://github.com/metachris/flashbotsrpc/workflows/Test/badge.svg)](https://github.com/metachris/flashbotsrpc/actions?query=workflow%3A%22Test%22)
+[![Test status](https://github.com/saman-pasha/flashxroute/workflows/Test/badge.svg)](https://github.com/saman-pasha/flashxroute/actions?query=workflow%3A%22Test%22)
 
-Fork of [ethrpc](https://github.com/metachris/flashbotsrpc) which is forked of [ethrpc](https://github.com/onrik/ethrpc) with additional [bloXroute methods](https://docs.bloxroute.com/apis/mev-solution):
+Fork of [flashbotsrpc](https://github.com/metachris/flashbotsrpc) which is forked of [ethrpc](https://github.com/onrik/ethrpc) with additional [bloXroute methods](https://docs.bloxroute.com/apis/mev-solution):
 
 * `BloxrouteSimulateBundle`
 * `BloxrouteSubmitBundle`

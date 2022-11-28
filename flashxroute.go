@@ -93,7 +93,7 @@ func (rpc *FlashXRoute) Call(method string, params ...interface{}) (json.RawMess
 		ID:      1,
 		JSONRPC: "2.0",
 		Method:  method,
-		Params:  params[0],
+		Params:  params,
 	}
 
 	body, err := json.Marshal(request)
@@ -145,12 +145,12 @@ func (rpc *FlashXRoute) Call(method string, params ...interface{}) (json.RawMess
 }
 
 // CallWithBloxrouteAuthHeader is like Call but also signs the request
-func (rpc *FlashXRoute) CallWithBloxrouteAuthHeader(method string, authHeader string, params ...interface{}) (json.RawMessage, error) {
+func (rpc *FlashXRoute) CallWithBloxrouteAuthHeader(method string, authHeader string, params interface{}) (json.RawMessage, error) {
 	request := rpcRequest{
 		ID:      1,
 		JSONRPC: "2.0",
 		Method:  method,
-		Params:  params[0],
+		Params:  params,
 	}
 
 	body, err := json.Marshal(request)

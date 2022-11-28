@@ -1,4 +1,4 @@
-module github.com/metachris/flashbotsrpc
+module github.com/saman-pasha/flashxroute
 
 go 1.18
 

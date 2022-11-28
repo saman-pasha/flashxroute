@@ -384,23 +384,23 @@ type BloxrouteBrmSimulateBundleResponse struct {
 
 // SubmitBundle
 type BloxrouteSubmitBundleRequest struct {
-	Transaction  []string     `json:"transaction"`                   // A list of raw transaction bytes without a 0x prefix.
-	BlockNumber  string       `json:"block_number"`                  /* Block number of a future block to include this bundle in, in hex value.
+	Transaction []string      `json:"transaction"`                   // A list of raw transaction bytes without a 0x prefix.
+	BlockNumber string        `json:"block_number"`                  /* Block number of a future block to include this bundle in, in hex value.
                                                                             For traders who would like more than one block to be targeted, please send multiple requests targeting each specific block. */
 	MinTimestamp *uint64      `json:"min_timestamp,omitempty"`       // [Optional] The minimum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
 	MaxTimestamp *uint64      `json:"max_timestamp,omitempty"`       // [Optional] The maximum timestamp that the bundle is valid on, an integer in unix epoch format. Default value is None.
 	RevertingHashes *[]string `json:"reverting_hashes,omitempty"`    /* [Optional] A list of transaction hashes within the bundle that are allowed to revert.
                                                                            Default is empty list: the whole bundle would be excluded if any transaction reverts. */
-	Uuid         string       `json:"uuid,omitempty"`                /* [Optional] A unique identifier of the bundle. This field can be used for bundle replacement and bundle cancellation.
+	Uuid string               `json:"uuid,omitempty"`                /* [Optional] A unique identifier of the bundle. This field can be used for bundle replacement and bundle cancellation.
                                                                             Some builders like bloxroute and builder0x69 support this field. After receiving a new UUID bundle,
                                                                             the builder would replace the previous bundle that has the same UUID. When the list of transactions is empty in new UUID bundle,
                                                                             the previous bundle associated with the same UUID would be effectively canceled.
                                                                             The response is empty/null instead of bundle hash when UUID is provided in the request. */
 	Frontrunning bool         `json:"frontrunning,omitempty"`        /* [Optional, default: True] A boolean flag indicating if the MEV bundle executes frontrunning strategy (e.g. generalized frontrunning,
                                                                             sandwiching). Some block builders and validators may not want to accept frontrunning bundles, which may experience a lower hash power. */
-	EffectiveGasPrice string  `json:"effective_gas_price,omitempty"` // [Optional, default: 0] An integer representing current bundle's effective gas price in wei.
-	CoinbaseProfit    string  `json:"coinbase_profit,omitempty"`     // [Optional, default: 0] An integer representing current bundle's coinbase profit in wei.
-	MevBuilders  []string     `json:"mev_builders,omitempty"`        /* [Optional, default: bloxroute builder and flashbots builder] A dictionary of MEV builders that should receive the bundle.
+	EffectiveGasPrice *string `json:"effective_gas_price,omitempty"` // [Optional, default: 0] An integer representing current bundle's effective gas price in wei.
+	CoinbaseProfit *string    `json:"coinbase_profit,omitempty"`     // [Optional, default: 0] An integer representing current bundle's coinbase profit in wei.
+	MevBuilders *[]string     `json:"mev_builders,omitempty"`        /* [Optional, default: bloxroute builder and flashbots builder] A dictionary of MEV builders that should receive the bundle.
                                                                             For each MEV builder, a signature is required. For flashbots builder, please provide the signature used in X-Flashbots-Signature header.
                                                                             For other builders, please provide empty string as signature. 
                                                                             Possible MEV builders are:

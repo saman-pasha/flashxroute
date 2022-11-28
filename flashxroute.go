@@ -32,6 +32,13 @@ type rpcResponse struct {
 }
 
 type rpcRequest struct {
+	ID      int           `json:"id"`
+	JSONRPC string        `json:"jsonrpc"`
+	Method  string        `json:"method"`
+	Params  []interface{} `json:"params"`
+}
+
+type BoxrouteRequest struct {
 	ID      int         `json:"id"`
 	JSONRPC string      `json:"jsonrpc"`
 	Method  string      `json:"method"`
@@ -146,7 +153,7 @@ func (rpc *FlashXRoute) Call(method string, params ...interface{}) (json.RawMess
 
 // CallWithBloxrouteAuthHeader is like Call but also signs the request
 func (rpc *FlashXRoute) CallWithBloxrouteAuthHeader(method string, authHeader string, params interface{}) (json.RawMessage, error) {
-	request := rpcRequest{
+	request := BoxrouteRequest{
 		ID:      1,
 		JSONRPC: "2.0",
 		Method:  method,

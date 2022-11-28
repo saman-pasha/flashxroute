@@ -150,7 +150,7 @@ func (rpc *FlashXRoute) CallWithBloxrouteAuthHeader(method string, authHeader st
 		ID:      1,
 		JSONRPC: "2.0",
 		Method:  method,
-		Params:  params,
+		Params:  params[0],
 	}
 
 	body, err := json.Marshal(request)

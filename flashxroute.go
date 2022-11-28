@@ -32,10 +32,10 @@ type rpcResponse struct {
 }
 
 type rpcRequest struct {
-	ID      int           `json:"id"`
-	JSONRPC string        `json:"jsonrpc"`
-	Method  string        `json:"method"`
-	Params  []interface{} `json:"params"`
+	ID      int         `json:"id"`
+	JSONRPC string      `json:"jsonrpc"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params"`
 }
 
 // FlashXRoute - Ethereum rpc client
@@ -93,7 +93,7 @@ func (rpc *FlashXRoute) Call(method string, params ...interface{}) (json.RawMess
 		ID:      1,
 		JSONRPC: "2.0",
 		Method:  method,
-		Params:  params,
+		Params:  params[0],
 	}
 
 	body, err := json.Marshal(request)

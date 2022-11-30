@@ -10,7 +10,8 @@ import (
 	"net/http"
 	"os"
 	"time"
-
+	"crypto/tls"
+	
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -176,7 +177,11 @@ func (rpc *FlashXRoute) CallWithBloxrouteAuthHeader(method string, authHeader st
 	for k, v := range rpc.Headers {
 		req.Header.Add(k, v)
 	}
+
+	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	httpClient := &http.Client{
+		Transport: transport,
 		Timeout: rpc.Timeout,
 	}
 

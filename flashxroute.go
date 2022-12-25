@@ -622,7 +622,7 @@ func (rpc *FlashXRoute) BloxrouteSimulateBundle(authHeader string, params Bloxro
 
 
 // https://docs.bloxroute.com/apis/mev-solution/arb-only-bundle-simulation
-func (rpc *FlashXRoute) BloxrouteBrmSimulateBundle(authHeader string, params BloxrouteSimulateBundleRequest) (res BloxrouteSimulateBundleResponse, err error) {
+func (rpc *FlashXRoute) BloxrouteBrmSimulateBundle(authHeader string, params BloxrouteBrmSimulateBundleRequest) (res BloxrouteSimulateBundleResponse, err error) {
 	rawMsg, err := rpc.CallWithBloxrouteAuthHeader("simulate_arb_only_bundle", authHeader, params)
 	if err != nil {
 		return res, err
@@ -642,7 +642,7 @@ func (rpc *FlashXRoute) BloxrouteSubmitBundle(authHeader string, params Bloxrout
 }
 
 // https://docs.bloxroute.com/apis/mev-solution/arb-only-bundle-submission
-func (rpc *FlashXRoute) BloxrouteBrmSubmitBundle(authHeader string, params BloxrouteSubmitBundleRequest) (res BloxrouteSubmitBundleResponse, err error) {
+func (rpc *FlashXRoute) BloxrouteBrmSubmitBundle(authHeader string, params BloxrouteBrmSubmitBundleRequest) (res BloxrouteSubmitBundleResponse, err error) {
 	rawMsg, err := rpc.CallWithBloxrouteAuthHeader("submit_arb_only_bundle", authHeader, params)
 	if err != nil {
 		return res, err

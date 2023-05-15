@@ -346,7 +346,7 @@ type BloxrouteBrmSimulateBundleRequest struct {
 	StateBlockNumber string   `json:"state_block_number,omitempty"` /* [Optional] Block number used as the base state to run a simulation on.
 	                                                                   Valid inputs include hex value of block number, or tags like “latest” and “pending”.
                                                                            Default value is “latest”. */
-	Timestamp        int64  `json:"timestamp,omitempty"`            // [Optional] Simulation timestamp, an integer in unix epoch format. Default value is None.
+	Timestamp        uint64  `json:"timestamp,omitempty"`           // [Optional] Simulation timestamp, an integer in unix epoch format. Default value is None.
 }
 
 type BloxrouteSimulateBundleResult struct {
@@ -435,4 +435,24 @@ type BloxrouteSendTransactionRequest struct {
 	BlockchainNetwork    string     `json:""blockchain_network,omitempty` /* [Optional, default: Mainnet] Blockchain network name. Use with Cloud-API when working with BSC.
                                                                                  Available options are: Mainnet for ETH Mainnet, BSC-Mainnet for BSC Mainnet, and Polygon-Mainnet for Polygon Mainnet. */
 	ValidatorsOnly       bool       `json:"validators_only,omitempty"`    // [Optional, default: False] Support for semi private transactions in all networks. See section Semi-Private Transaction for more info.
+}
+
+// SendPrivateTransaction
+type BloxrouteSendPrivateTransactionRequest struct {
+	Transaction          string    `json:"transaction"`              // [Mandatory] Raw transactions bytes without 0x prefix.
+	Timeout              *uint64   `json:"timeout,omitempty"`        /* [Optional] An integer value that represents the time, in seconds, needed to wait for a Private Transaction to be included in a block.
+	                                                                    If omitted, it defaults to 0. If timeout is not 0 and the transaction is not mined after the timeout value,
+                                                                            it will be sent publicly. If the timeout is 0, no public transaction will be sent. */
+	Frontrunning         bool      `json:"frontrunning,omitempty"`   /* [Optional, default: True] A boolean flag indicating if the MEV bundle executes frontrunning strategy (e.g. generalized frontrunning,
+                                                                            sandwiching). Some block builders and validators may not want to accept frontrunning bundles, which may experience a lower hash power. */
+	MevBuilders          *[]string `json:"mev_builders,omitempty"`   /* [Optional, default: bloxroute builder and flashbots builder] A dictionary of MEV builders that should receive the bundle.
+                                                                            For each MEV builder, a signature is required. For flashbots builder, please provide the signature used in X-Flashbots-Signature header.
+                                                                            For other builders, please provide empty string as signature. 
+                                                                            Possible MEV builders are:
+                                                                                bloxroute: bloXroute internal builder
+                                                                                flashbots: flashbots builder
+                                                                                builder0x69: builder0x69​
+                                                                                beaverbuild:  beaverbuild.org​
+                                                                                all: all builders
+                                                                            Traders can refer to List of External Builders page for a full list. */
 }

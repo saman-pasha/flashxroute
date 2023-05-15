@@ -719,3 +719,13 @@ func (rpc *FlashXRoute) BloxrouteSendTransaction(authHeader string, params Bloxr
 	err = json.Unmarshal(rawMsg, &txHash)
 	return txHash, err
 }
+
+// This endpoint allows you to send a private transaction that will be distributed faster using the BDN.
+func (rpc *FlashXRoute) BloxrouteSendPrivateTransaction(authHeader string, params BloxrouteSendPrivateTransactionRequest) (txHash string, err error) {
+	rawMsg, err := rpc.CallWithBloxrouteAuthHeader("blxr_private_tx", authHeader, params)
+	if err != nil {
+		return "", err
+	}
+	err = json.Unmarshal(rawMsg, &txHash)
+	return txHash, err
+}
